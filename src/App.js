@@ -5,6 +5,7 @@ import Header from "./components/Header/";
 import SearchBar from "./components/SearchBar/";
 import JobCard from "./components/Job/JobCard";
 import NewJobModal from "./components/Job/NewJobModal";
+import ViewJobModal from "./components/Job/ViewJobModal";
 import { myFirestore, app } from "./firebase/config";
 // import jobData from "./dummyData";
 import {Close, Close as CloseIcon} from '@material-ui/icons'
@@ -16,6 +17,7 @@ export default (props) => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [customSearch, setCustomSearch] = useState(false);
+  const [viewJobs, setViewJobs] = useState({});
 
   const fetchJobs = async () => {
     setLoading(true);
@@ -61,8 +63,13 @@ export default (props) => {
   return <ThemeProvider theme={theme}>
     <Header openJobModal={()=>setNewJobModal(true)} />
 
+    {/* New Job Modal */}
     <NewJobModal closeJobModal={()=>setNewJobModal(false)} newJobModal={newJobModal} postJob={postJob} />
     
+    {/* View Job Modal */}
+    <ViewJobModal job={viewJobs} closeModal={()=>{setViewJobs({})}} />
+
+
     <Box mb={3}>
       <Grid container justifyContent="center">
         <Grid item xs={10}>
@@ -77,7 +84,7 @@ export default (props) => {
                   <Close size={20} /> Custom Search
                 </Button>
               </Box>)}
-              {jobs.map((job) => (<JobCard key={job.id} {...job} />))}
+              {jobs.map((job) => (<JobCard open={()=>{setViewJobs(job)}} key={job.id} {...job} />))}
                 
               </>
               )}
