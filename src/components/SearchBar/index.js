@@ -1,5 +1,5 @@
-import React from 'react'
-import {Box, Grid, Select, MenuItem, Button, makeStyles} from '@material-ui/core';
+import React, { useState } from 'react'
+import {Box, Grid, Select, MenuItem, Button, makeStyles, CircularProgress} from '@material-ui/core';
 
 const styles = makeStyles({
     wrapper:{
@@ -16,24 +16,43 @@ const styles = makeStyles({
     },
 })
 
-export default function index() {
+export default (props) => {
+
+    const [loading, setLoading] = useState(false)
+    const [jobSearch, setJobSearch] = useState({
+        type: 'Full Time',
+        location:'Remote',
+    })
+
+    const handleChange = e =>{
+        e.persist();
+        setJobSearch((oldState)=>({ ...oldState, [e.target.name]: e.target.value }) )
+    }
+
+    // console.log(jobSearch);
+
+    const search = async () => {
+        setLoading(true)
+        await props.fetchJobsCustom(jobSearch);
+        setLoading(false)
+    }
 
     const classes = styles()
 
   return (
     <Box p={2} mt={-5} mb={2} className={classes.wrapper}>
-        <Select disableUnderline variant='filled' defaultValue="full time">
+        <Select onChange={handleChange} name="type" disableUnderline variant='filled' defaultValue="full time">
             <MenuItem value="full time">Full Time</MenuItem>
-            <MenuItem value="fart time">Part Time</MenuItem>
+            <MenuItem value="part time">Part Time</MenuItem>
             <MenuItem value="contract">Contract</MenuItem>
         </Select>
        
-        <Select disableUnderline variant='filled' defaultValue="remote">
+        <Select onChange={handleChange} name="location" disableUnderline variant='filled' defaultValue="remote">
             <MenuItem value="remote">Remote</MenuItem>
             <MenuItem value="in-office">In-Office</MenuItem>
         </Select>
 
-        <Button variant="contained" color="primary" disableElevation>Post a job</Button>
+        <Button variant="contained" disabled={loading} color="primary" onClick={search} disableElevation>{loading? <CircularProgress color="secondary" size={22}/>:"Search"}</Button>
     </Box>
   )
 }
